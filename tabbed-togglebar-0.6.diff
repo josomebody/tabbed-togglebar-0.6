@@ -1,0 +1,63 @@
+diff -up tabbed-0.6/config.def.h tabbed-0.6-patched/config.def.h
+--- tabbed-0.6/config.def.h	2014-01-21 13:22:03.000000000 -0500
++++ tabbed-0.6-patched/config.def.h	2019-04-03 02:48:58.520640085 -0500
+@@ -40,6 +40,8 @@ static Key keys[] = { \
+ 	{ MODKEY|ShiftMask,             XK_k,      movetab,        { .i = +1 } },
+ 	{ MODKEY,                       XK_Tab,    rotate,         { .i = 0 } },
+ 
++	{ MODKEY,			XK_b,	   togglebar,	   { 0 } },
++
+ 	{ MODKEY,                       XK_1,      move,           { .i = 0 } },
+ 	{ MODKEY,                       XK_2,      move,           { .i = 1 } },
+ 	{ MODKEY,                       XK_3,      move,           { .i = 2 } },
+Only in tabbed-0.6-patched: config.h
+diff -up tabbed-0.6/tabbed.c tabbed-0.6-patched/tabbed.c
+--- tabbed-0.6/tabbed.c	2014-01-21 13:22:03.000000000 -0500
++++ tabbed-0.6-patched/tabbed.c	2019-04-03 03:22:29.750715514 -0500
+@@ -126,6 +126,7 @@ static void setcmd(int argc, char *argv[
+ static void sigchld(int unused);
+ static void spawn(const Arg *arg);
+ static int textnw(const char *text, unsigned int len);
++static void togglebar(const Arg *arg);
+ static void unmanage(int c);
+ static void updatenumlockmask(void);
+ static void updatetitle(int c);
+@@ -163,6 +164,7 @@ static char winid[64];
+ static char **cmd = NULL;
+ static char *wmname = "tabbed";
+ static const char *geometry = NULL;
++static Bool showbar = True;
+ 
+ char *argv0;
+ 
+@@ -309,6 +311,10 @@ drawbar(void) {
+ 	int c, fc, width, n = 0;
+ 	char *name = NULL;
+ 
++	if(!showbar) {
++		return;
++	}
++
+ 	if(nclients == 0) {
+ 		dc.x = 0;
+ 		dc.w = ww;
+@@ -1052,6 +1058,19 @@ textnw(const char *text, unsigned int le
+ }
+ 
+ void
++togglebar(const Arg *arg) {
++	showbar=!showbar;
++	if(!showbar) {
++		bh = 0;
++	} else {
++		bh = dc.font.height + 2;
++	}
++	for(int i = 0; i < nclients; i++) {
++		XMoveResizeWindow(dpy, clients[i]->win, 0, bh, ww, wh - bh);
++	}
++}
++
++void
+ unmanage(int c) {
+ 	if(c < 0 || c >= nclients) {
+ 		drawbar();
