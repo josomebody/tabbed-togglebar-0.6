@@ -13,7 +13,7 @@ diff -up tabbed-0.6/config.def.h tabbed-0.6-patched/config.def.h
 Only in tabbed-0.6-patched: config.h
 diff -up tabbed-0.6/tabbed.c tabbed-0.6-patched/tabbed.c
 --- tabbed-0.6/tabbed.c	2014-01-21 13:22:03.000000000 -0500
-+++ tabbed-0.6-patched/tabbed.c	2019-04-03 03:22:29.750715514 -0500
++++ tabbed-0.6-patched/tabbed.c	2019-04-14 22:09:56.081532808 -0500
 @@ -126,6 +126,7 @@ static void setcmd(int argc, char *argv[
  static void sigchld(int unused);
  static void spawn(const Arg *arg);
@@ -41,18 +41,19 @@ diff -up tabbed-0.6/tabbed.c tabbed-0.6-patched/tabbed.c
  	if(nclients == 0) {
  		dc.x = 0;
  		dc.w = ww;
-@@ -1052,6 +1058,19 @@ textnw(const char *text, unsigned int le
+@@ -1052,6 +1058,20 @@ textnw(const char *text, unsigned int le
  }
  
  void
 +togglebar(const Arg *arg) {
++	int i;
 +	showbar=!showbar;
 +	if(!showbar) {
 +		bh = 0;
 +	} else {
 +		bh = dc.font.height + 2;
 +	}
-+	for(int i = 0; i < nclients; i++) {
++	for(i = 0; i < nclients; i++) {
 +		XMoveResizeWindow(dpy, clients[i]->win, 0, bh, ww, wh - bh);
 +	}
 +}
